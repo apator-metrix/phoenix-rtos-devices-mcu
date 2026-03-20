@@ -55,6 +55,18 @@ static const int gpio2pctl[GPIO_MAX + 1] = {
 	[gpiop] = pctl_gpiop,
 	[gpioq] = pctl_gpioq,
 };
+#elif defined(__CPU_STM32U3)
+#define GPIO_MAX gpioh
+static const int gpio2pctl[GPIO_MAX + 1] = {
+	[gpioa] = pctl_gpioa,
+	[gpiob] = pctl_gpiob,
+	[gpioc] = pctl_gpioc,
+	[gpiod] = pctl_gpiod,
+	[gpioe] = pctl_gpioe,
+	[gpiof] = pctl_gpiof,
+	[gpiog] = pctl_gpiog,
+	[gpioh] = pctl_gpioh,
+};
 #endif
 
 
