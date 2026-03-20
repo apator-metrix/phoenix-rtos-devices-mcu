@@ -17,6 +17,12 @@
 
 #define GPDMA_BASE ((void *)0x50020000U)
 
+#define USART1_BASE ((void *)0x50013800U)
+#define USART2_BASE ((void *)0x50004400U)
+#define USART3_BASE ((void *)0x50004800U)
+#define UART4_BASE  ((void *)0x50004c00U)
+#define UART5_BASE  ((void *)0x50005000U)
+
 #define PWR_BASE    ((void *)0x50030800U)
 #define RCC_BASE    ((void *)0x50030c00U)
 
