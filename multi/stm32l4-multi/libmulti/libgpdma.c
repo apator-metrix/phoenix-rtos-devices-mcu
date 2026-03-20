@@ -1,10 +1,11 @@
 /*
  * Phoenix-RTOS
  *
- * STM32N6 DMA driver
+ * STM32N6/U3 DMA driver
  *
  * Copyright 2020-2025 Phoenix Systems
- * Author: Daniel Sawka, Aleksander Kaminski, Jacek Maksymowicz
+ * Copyright 2026 Apator Metrix
+ * Author: Daniel Sawka, Aleksander Kaminski, Jacek Maksymowicz, Mateusz Karcz
  *
  * %LICENSE%
  */
@@ -25,14 +26,28 @@
 #define DMA_SYSPAGE_MAP_NAME "dmamem"
 
 #define DMA_CTRL_GPDMA1     0
+#if defined(__CPU_STM32N6)
 #define DMA_CTRL_HPDMA1     1
 #define DMA_NUM_CONTROLLERS 2
+#define DMA_DEFAULT         DMA_CTRL_HPDMA1
+#define GPDMA1_MAX_IRQ      gpdma1_ch15_irq
+#elif defined(__CPU_STM32U3)
+#define DMA_NUM_CONTROLLERS 1
+#define DMA_DEFAULT         DMA_CTRL_GPDMA1
+#define GPDMA1_MAX_IRQ      gpdma1_ch11_irq
+#endif
+
 /* Channels 12..15 are capable of 2D transfers, others can only do linear transfers */
+#if defined(__CPU_STM32N6)
 #define DMA_NUM_CHANNELS    16
+#elif defined(__CPU_STM32U3)
+#define DMA_NUM_CHANNELS    12
+#endif
 #define DMA_2D_CAPABLE_MASK ((1 << 16) - (1 << 12))
 
 
 enum dma_reqs {
+#if defined(__CPU_STM32N6)
 	dma_req_jpeg_rx = 0,
 	dma_req_jpeg_tx = 1,
 	dma_req_xspi1 = 2,
@@ -176,6 +191,110 @@ enum dma_reqs {
 	dma_req_i3c1_rs = 142,
 	dma_req_i3c2_tc = 143,
 	dma_req_i3c2_rs = 144,
+#elif defined(__CPU_STM32U3)
+	dma_req_adc1 = 0,
+	dma_req_adc2,
+	dma_req_dac1,
+	dma_req_dac2,
+	dma_req_tim6_upd,
+	dma_req_tim7_upd,
+	dma_req_spi1_rx,
+	dma_req_spi1_tx,
+	dma_req_spi2_rx,
+	dma_req_spi2_tx,
+	dma_req_spi3_rx,
+	dma_req_spi3_tx,
+	dma_req_i2c1_rx,
+	dma_req_i2c1_tx,
+	dma_req_i2c1_evc,
+	dma_req_i2c2_rx,
+	dma_req_i2c2_tx,
+	dma_req_i2c2_evc,
+	dma_req_i2c3_rx,
+	dma_req_i2c3_tx,
+	dma_req_i2c3_evc,
+	dma_req_i2c4_rx,
+	dma_req_i2c4_tx,
+	dma_req_i2c4_evc,
+	dma_req_usart1_rx,
+	dma_req_usart1_tx,
+	dma_req_usart2_rx,
+	dma_req_usart2_tx,
+	dma_req_usart3_rx,
+	dma_req_usart3_tx,
+	dma_req_uart4_rx,
+	dma_req_uart4_tx,
+	dma_req_uart5_rx,
+	dma_req_uart5_tx,
+	dma_req_lpuart1_rx,
+	dma_req_lpuart1_tx,
+	dma_req_sai1_a,
+	dma_req_sai1_b,
+	dma_req_octospi1 = 40,
+	dma_req_tim1_cc1 = 42,
+	dma_req_tim1_cc2,
+	dma_req_tim1_cc3,
+	dma_req_tim1_cc4,
+	dma_req_tim1_upd,
+	dma_req_tim1_trig,
+	dma_req_tim1_com,
+	dma_req_i3c1_rx,
+	dma_req_i3c1_tx,
+	dma_req_i3c1_tc,
+	dma_req_i3c1_rs,
+	dma_req_tim2_cc1 = 56,
+	dma_req_tim2_cc2,
+	dma_req_tim2_cc3,
+	dma_req_tim2_cc4,
+	dma_req_tim2_upd,
+	dma_req_tim3_cc1,
+	dma_req_tim3_cc2,
+	dma_req_tim3_cc3,
+	dma_req_tim3_cc4,
+	dma_req_tim3_upd,
+	dma_req_tim3_trig,
+	dma_req_tim4_cc1,
+	dma_req_tim4_cc2,
+	dma_req_tim4_cc3,
+	dma_req_tim4_cc4,
+	dma_req_tim4_upd,
+	dma_req_i3c2_rx,
+	dma_req_i3c2_tx,
+	dma_req_i3c2_tc,
+	dma_req_i3c2_rs,
+	dma_req_spi4_rx,
+	dma_req_spi4_tx,
+	dma_req_tim15_cc1,
+	dma_req_tim15_upd,
+	dma_req_tim15_trig,
+	dma_req_tim15_com,
+	dma_req_tim16_cc1,
+	dma_req_tim16_upd,
+	dma_req_tim17_cc1,
+	dma_req_tim17_upd,
+	dma_req_aes_in = 87,
+	dma_req_aes_out,
+	dma_req_hash_in,
+	dma_req_tim8_cc1 = 91,
+	dma_req_tim8_cc2,
+	dma_req_tim8_cc3,
+	dma_req_tim8_cc4,
+	dma_req_tim8_upd,
+	dma_req_tim8_trig,
+	dma_req_tim8_com,
+	dma_req_adf1_flt0,
+	dma_req_saes_in = 103,
+	dma_req_saes_out,
+	dma_req_lptim1_ic1,
+	dma_req_lptim1_ic2,
+	dma_req_lptim1_ue,
+	dma_req_lptim2_ic1,
+	dma_req_lptim2_ic2,
+	dma_req_lptim2_ue,
+	dma_req_lptim3_ic1,
+	dma_req_lptim3_ic2,
+	dma_req_lptim3_ue,
+#endif
 	dma_req_sw_trig = 254,
 	dma_req_invalid = 255,
 };
@@ -279,11 +398,13 @@ static const struct libdma_perSetup libdma_persUart[] = {
 	[usart3] = { .defDMA = DMA_CTRL_GPDMA1, .requests = { dma_req_usart3_rx, dma_req_usart3_tx }, .portPer = 1, .portMem = 0, .valid = 1 },
 	[uart4] = { .defDMA = DMA_CTRL_GPDMA1, .requests = { dma_req_uart4_rx, dma_req_uart4_tx }, .portPer = 1, .portMem = 0, .valid = 1 },
 	[uart5] = { .defDMA = DMA_CTRL_GPDMA1, .requests = { dma_req_uart5_rx, dma_req_uart5_tx }, .portPer = 1, .portMem = 0, .valid = 1 },
+#if defined(__CPU_STM32N6)
 	[usart6] = { .defDMA = DMA_CTRL_GPDMA1, .requests = { dma_req_usart6_rx, dma_req_usart6_tx }, .portPer = 1, .portMem = 0, .valid = 1 },
 	[uart7] = { .defDMA = DMA_CTRL_GPDMA1, .requests = { dma_req_uart7_rx, dma_req_uart7_tx }, .portPer = 1, .portMem = 0, .valid = 1 },
 	[uart8] = { .defDMA = DMA_CTRL_GPDMA1, .requests = { dma_req_uart8_rx, dma_req_uart8_tx }, .portPer = 1, .portMem = 0, .valid = 1 },
 	[uart9] = { .defDMA = DMA_CTRL_GPDMA1, .requests = { dma_req_uart9_rx, dma_req_uart9_tx }, .portPer = 1, .portMem = 0, .valid = 1 },
 	[usart10] = { .defDMA = DMA_CTRL_GPDMA1, .requests = { dma_req_usart10_rx, dma_req_usart10_tx }, .portPer = 1, .portMem = 0, .valid = 1 },
+#endif
 };
 
 
@@ -292,8 +413,10 @@ static const struct libdma_perSetup libdma_persSpi[] = {
 	[spi2] = { .defDMA = DMA_CTRL_GPDMA1, .requests = { dma_req_spi2_rx, dma_req_spi2_tx }, .portPer = 1, .portMem = 0, .valid = 1 },
 	[spi3] = { .defDMA = DMA_CTRL_GPDMA1, .requests = { dma_req_spi3_rx, dma_req_spi3_tx }, .portPer = 1, .portMem = 0, .valid = 1 },
 	[spi4] = { .defDMA = DMA_CTRL_GPDMA1, .requests = { dma_req_spi4_rx, dma_req_spi4_tx }, .portPer = 1, .portMem = 0, .valid = 1 },
+#if defined(__CPU_STM32N6)
 	[spi5] = { .defDMA = DMA_CTRL_GPDMA1, .requests = { dma_req_spi5_rx, dma_req_spi5_tx }, .portPer = 1, .portMem = 0, .valid = 1 },
 	[spi6] = { .defDMA = DMA_CTRL_GPDMA1, .requests = { dma_req_spi6_rx, dma_req_spi6_tx }, .portPer = 1, .portMem = 0, .valid = 1 },
+#endif
 };
 
 
@@ -302,7 +425,9 @@ static const struct libdma_perSetup libdma_persTimUpd[] = {
 	[pwm_tim2] = { .defDMA = DMA_CTRL_GPDMA1, .requests = { dma_req_invalid, dma_req_tim2_upd }, .portPer = 1, .portMem = 0, .valid = 1 },
 	[pwm_tim3] = { .defDMA = DMA_CTRL_GPDMA1, .requests = { dma_req_invalid, dma_req_tim3_upd }, .portPer = 1, .portMem = 0, .valid = 1 },
 	[pwm_tim4] = { .defDMA = DMA_CTRL_GPDMA1, .requests = { dma_req_invalid, dma_req_tim4_upd }, .portPer = 1, .portMem = 0, .valid = 1 },
+#if defined(__CPU_STM32N6)
 	[pwm_tim5] = { .defDMA = DMA_CTRL_GPDMA1, .requests = { dma_req_invalid, dma_req_tim5_upd }, .portPer = 1, .portMem = 0, .valid = 1 },
+#endif
 	[pwm_tim8] = { .defDMA = DMA_CTRL_GPDMA1, .requests = { dma_req_invalid, dma_req_tim8_upd }, .portPer = 1, .portMem = 0, .valid = 1 },
 	[pwm_tim15] = { .defDMA = DMA_CTRL_GPDMA1, .requests = { dma_req_invalid, dma_req_tim15_upd }, .portPer = 1, .portMem = 0, .valid = 1 },
 	[pwm_tim16] = { .defDMA = DMA_CTRL_GPDMA1, .requests = { dma_req_invalid, dma_req_tim16_upd }, .portPer = 1, .portMem = 0, .valid = 1 },
@@ -311,8 +436,8 @@ static const struct libdma_perSetup libdma_persTimUpd[] = {
 
 
 static const struct libdma_perSetup libdma_persMemTransfer[] = {
-	[memTransfer_perIsDst] = { .defDMA = DMA_CTRL_HPDMA1, .requests = { dma_req_invalid, dma_req_sw_trig }, .portPer = 0, .portMem = 0, .valid = 1 },
-	[memTransfer_perIsSrc] = { .defDMA = DMA_CTRL_HPDMA1, .requests = { dma_req_sw_trig, dma_req_invalid }, .portPer = 0, .portMem = 0, .valid = 1 },
+	[memTransfer_perIsDst] = { .defDMA = DMA_DEFAULT, .requests = { dma_req_invalid, dma_req_sw_trig }, .portPer = 0, .portMem = 0, .valid = 1 },
+	[memTransfer_perIsSrc] = { .defDMA = DMA_DEFAULT, .requests = { dma_req_sw_trig, dma_req_invalid }, .portPer = 0, .portMem = 0, .valid = 1 },
 };
 
 
@@ -347,11 +472,13 @@ static const struct dma_setup {
 		.pctl = pctl_gpdma1,
 		.isHPDMA = false,
 	},
+#if defined(DMA_CTRL_HPDMA1)
 	[DMA_CTRL_HPDMA1] = {
 		.base = HPDMA_BASE,
 		.pctl = pctl_hpdma1,
 		.isHPDMA = true,
 	},
+#endif
 };
 
 
@@ -432,6 +559,7 @@ static bool libxpdma_isInsideDMAMemory(const void *addr, size_t sz)
 }
 
 
+#if defined(__CPU_STM32N6)
 static inline bool libdma_irqToChannel(int irq, unsigned int *dma, unsigned int *chn)
 {
 	if ((irq >= gpdma1_ch0_irq) && (irq <= gpdma1_ch15_irq)) {
@@ -460,6 +588,42 @@ static inline int libdma_channelToIRQ(unsigned int dma, unsigned int chn)
 
 	return 0;
 }
+#elif defined(__CPU_STM32U3)
+static inline bool libdma_irqToChannel(int irq, unsigned int *dma, unsigned int *chn)
+{
+	if ((irq >= gpdma1_ch0_irq) && (irq <= gpdma1_ch7_irq)) {
+		*dma = DMA_CTRL_GPDMA1;
+		*chn = irq - gpdma1_ch0_irq;
+		return true;
+	}
+
+	if ((irq >= gpdma1_ch8_irq) && (irq <= gpdma1_ch11_irq)) {
+		*dma = DMA_CTRL_GPDMA1;
+		*chn = 8 + irq - gpdma1_ch8_irq;
+		return true;
+	}
+
+	return false;
+}
+
+
+static inline int libdma_channelToIRQ(unsigned int dma, unsigned int chn)
+{
+	if (dma != DMA_CTRL_GPDMA1) {
+		return 0;
+	}
+
+	if ((chn >= 0) && (chn <= 7)) {
+		return gpdma1_ch0_irq + chn;
+	}
+
+	if ((chn >= 8) && (chn <= 11)) {
+		return gpdma1_ch8_irq + chn - 8;
+	}
+
+	return 0;
+}
+#endif
 
 
 static inline volatile uint32_t *libdma_channelBase(int dma, unsigned int chn)
