@@ -19,7 +19,7 @@
 #include <phoenix/types.h>
 #include <stdint.h>
 
-#if defined(__CPU_STM32N6)
+#if defined(__CPU_STM32N6) || defined(__CPU_STM32U3)
 #include "rcc/clockdef.h"
 
 
