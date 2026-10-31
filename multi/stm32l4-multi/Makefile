@@ -17,7 +17,7 @@ else ifeq ($(TARGET_SUBFAMILY),stm32n6)
   LOCAL_SRCS += adc_n6.c pwm_n6.c rcc/clockdef.c xspi/xspi_n6.c xspi/mce.c
 else ifeq ($(TARGET_SUBFAMILY),stm32u3)
   LOCAL_CFLAGS += -DMULTIDRV_STACKSZ=2048
-  LOCAL_SRCS += adc_n6.c rcc/clockdef.c
+  LOCAL_SRCS += adc_n6.c flash_u3.c rcc/clockdef.c
 endif
 
 LOCAL_HEADERS := stm32l4-multi.h

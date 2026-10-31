@@ -17,6 +17,8 @@
 
 #define EXTI_BASE ((void *)0x50032000U)
 
+#define FLASH_BASE ((void *)0x40022000)
+
 #define GPDMA_BASE ((void *)0x50020000U)
 
 #define USART1_BASE ((void *)0x50013800U)
@@ -43,6 +45,8 @@
 #define SPI1_BASE ((void *)0x50013000)
 #define SPI2_BASE ((void *)0x50003800)
 #define SPI3_BASE ((void *)0x50002000)
+
+#define SYSCFG_BASE ((void *)0x40040400)
 
 #define I2C1_BASE ((void *)0x50005400U)
 #define I2C2_BASE ((void *)0x50005800U)
