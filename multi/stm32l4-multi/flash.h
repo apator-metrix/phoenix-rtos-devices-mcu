@@ -27,7 +27,7 @@
 #define FLASH_PAGE_SIZE 2048
 #endif
 
-#if !defined(__CPU_STM32U3) // not used by STM32U3 Flash driver
+#if !defined(__CPU_STM32U3)  // not used by STM32U3 Flash driver
 #define FLASH_OB_1_ADDR 0x1fff7800
 #define FLASH_OB_2_ADDR 0x1ffff800
 #define FLASH_OB_SIZE   16
@@ -38,12 +38,12 @@
 #endif
 
 #if defined(__CPU_STM32U3)
-#ifndef FLASH_PROGRAM_2_ADDR
-#define FLASH_PROGRAM_2_ADDR 0x08100000
-#endif
-
 #ifndef FLASH_PROGRAM_BANK_SIZE
 #define FLASH_PROGRAM_BANK_SIZE (1024 * 1024)
+#endif
+
+#ifndef FLASH_PROGRAM_2_ADDR
+#define FLASH_PROGRAM_2_ADDR (FLASH_PROGRAM_1_ADDR + FLASH_PROGRAM_BANK_SIZE)
 #endif
 #else
 

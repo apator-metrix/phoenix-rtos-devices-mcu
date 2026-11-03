@@ -1,10 +1,10 @@
 /*
  * Phoenix-RTOS
  *
- * STM32L4 internal flash driver
+ * STM32L4/STM32U3 internal flash driver
  *
- * Copyright 2017, 2018, 2022 Phoenix Systems
- * Author: Aleksander Kaminski, Jakub Sejdak, Tomasz Korniluk
+ * Copyright 2017, 2018, 2022, 2026 Phoenix Systems
+ * Author: Aleksander Kaminski, Jakub Sejdak, Tomasz Korniluk, Pawel Juszczyk
  *
  * This file is part of Phoenix-RTOS.
  *
@@ -25,6 +25,19 @@
 
 
 enum {
+#if defined(__CPU_STM32U3)
+	/* Please bear in mind that this is not
+	   the full list of Flash control registers.
+	   The vast majority of registers was omitted
+	   for brevity */
+	flash_acr = 0,
+	flash_keyr = flash_acr + 2,
+	flash_sr = flash_keyr + 6,
+	flash_cr = flash_sr + 2,
+	flash_ecccorr = flash_cr + 2,
+	flash_eccdetr,
+	flash_optr = flash_eccdetr + 3
+#else
 	flash_acr = 0,
 	flash_pdkeyr,
 	flash_keyr,
@@ -41,6 +54,7 @@ enum {
 	flash_pcrop2er,
 	flash_wrp2ar,
 	flash_wrp2br,
+#endif
 };
 
 
@@ -88,7 +102,13 @@ static int _flash_wait(void)
 
 static inline void _flash_clearFlags(void)
 {
+#if defined(__CPU_STM32U3)
+	*(flash_common.flash + flash_sr) |= 0x20fb;
+	*(flash_common.flash + flash_ecccorr) |= 0x40000000;
+	*(flash_common.flash + flash_eccdetr) |= 0x80000000;
+#else
 	*(flash_common.flash + flash_sr) |= 0xc3fb;
+#endif
 	dataBarier();
 	flash_common.operr = 0;
 }
@@ -326,7 +346,12 @@ static unsigned int _flash_getOptions(void)
 void flash_getInfo(flashinfo_t *info)
 {
 	info->dualbank = !!(_flash_getOptions() & (1 << 21));
+#if defined(__CPU_STM32U3)
+	/* STM32U3 has no BFB2 bit */
+	info->dualboot = 0;
+#else
 	info->dualboot = !!(_flash_getOptions() & (1 << 20));
+#endif
 	info->remap = flash_common.bankflip;
 	info->activebank = flash_common.activebank;
 }
@@ -380,12 +405,15 @@ ssize_t flash_erasePage(uint32_t offset)
 
 int flash_init(void)
 {
-	volatile unsigned int *syscfg = SYSCFG_BASE;
-
 	flash_common.flash = FLASH_BASE;
 
 	/* Check what flash bank is mapped at FLASH_PROGRAM_1_ADDR */
+#if defined(__CPU_STM32U3)
+	flash_common.bankflip = ((_flash_getOptions() & (1 << 20)) != 0) ? 1 : 0;
+#else
+	volatile unsigned int *syscfg = SYSCFG_BASE;
 	flash_common.bankflip = ((*syscfg & (1 << 8)) != 0) ? 1 : 0;
+#endif
 	flash_common.activebank = flash_activeBank() ^ flash_common.bankflip;
 
 	mutexCreate(&flash_common.lock);
